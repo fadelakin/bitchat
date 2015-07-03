@@ -1,10 +1,13 @@
 package com.fisheradelakin.bitchat;
 
 import android.app.Activity;
+import android.support.v4.app.LoaderManager;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +19,8 @@ import android.widget.SimpleCursorAdapter;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = "ContactsFragment";
 
@@ -35,18 +39,16 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
         String[] columns  = {ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
         int[] ids = {R.id.number, R.id.name};
-        Cursor cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone._ID,
-                        ContactsContract.CommonDataKinds.Phone.NUMBER,
-                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME}, null, null, null);
 
         listView.setAdapter(new SimpleCursorAdapter(
                 getActivity(),
                 R.layout.contact_list_item,
-                cursor,
+                null,
                 columns,
                 ids,
                 0));
+
+        getLoaderManager().initLoader(0, null, this);
 
         return v;
     }
@@ -75,6 +77,30 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
         Log.d(TAG, "Phone number is " + cursor.getString(1));
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(
+                getActivity(),
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{ContactsContract.CommonDataKinds.Phone._ID,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER,
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME},
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.d(TAG, "Got a cursor");
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
 
     public interface Listener {
     }
