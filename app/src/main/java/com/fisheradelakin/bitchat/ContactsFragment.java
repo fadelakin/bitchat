@@ -9,11 +9,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ContactsFragment extends Fragment {
+public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = "ContactsFragment";
 
@@ -27,19 +30,23 @@ public class ContactsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_contacts, container, false);
 
-        String[] columns  = {ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
+        ListView listView = (ListView) v.findViewById(R.id.list);
+        listView.setOnItemClickListener(this);
 
+        String[] columns  = {ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
+        int[] ids = {R.id.number, R.id.name};
         Cursor cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                columns, null, null, null);
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
-            // get the names and numbers of people in my phone
-            String number = cursor.getString(0);
-            String name = cursor.getString(1);
-            Log.d(TAG, name +" "+number);
-            cursor.moveToNext();
-        }
-        cursor.close();
+                new String[]{ContactsContract.CommonDataKinds.Phone._ID,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER,
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME}, null, null, null);
+
+        listView.setAdapter(new SimpleCursorAdapter(
+                getActivity(),
+                R.layout.contact_list_item,
+                cursor,
+                columns,
+                ids,
+                0));
 
         return v;
     }
@@ -59,6 +66,14 @@ public class ContactsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Cursor cursor = ((SimpleCursorAdapter) parent.getAdapter()).getCursor();
+        cursor.moveToPosition(position);
+
+        Log.d(TAG, "Phone number is " + cursor.getString(1));
     }
 
     public interface Listener {
