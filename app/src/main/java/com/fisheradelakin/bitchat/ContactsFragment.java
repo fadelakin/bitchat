@@ -25,6 +25,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     private static final String TAG = "ContactsFragment";
 
     private Listener mListener;
+    private SimpleCursorAdapter mCursorAdapter;
 
     public ContactsFragment() {
     }
@@ -40,13 +41,15 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         String[] columns  = {ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
         int[] ids = {R.id.number, R.id.name};
 
-        listView.setAdapter(new SimpleCursorAdapter(
+        mCursorAdapter = new SimpleCursorAdapter(
                 getActivity(),
                 R.layout.contact_list_item,
                 null,
                 columns,
                 ids,
-                0));
+                0);
+
+        listView.setAdapter(mCursorAdapter);
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -93,12 +96,12 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Log.d(TAG, "Got a cursor");
+        mCursorAdapter.swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mCursorAdapter.swapCursor(null);
     }
 
 
