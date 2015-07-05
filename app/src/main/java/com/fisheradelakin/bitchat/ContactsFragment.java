@@ -29,8 +29,7 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener, ContactDataSource.Listener{
 
     private static final String TAG = "ContactsFragment";
 
@@ -49,13 +48,12 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         ListView listView = (ListView) v.findViewById(R.id.list);
         listView.setOnItemClickListener(this);
 
-        String[] columns  = {ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
-        int[] ids = {R.id.number, R.id.name};
 
+        ContactDataSource dataSource = new ContactDataSource(getActivity(), this);
         mAdapter = new ContactAdapter(mContacts);
         listView.setAdapter(mAdapter);
 
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, dataSource);
 
         return v;
     }
@@ -79,67 +77,15 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Cursor cursor = ((SimpleCursorAdapter) parent.getAdapter()).getCursor();
-        cursor.moveToPosition(position);
 
-        Log.d(TAG, "Phone number is " + cursor.getString(1));
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(
-                getActivity(),
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone._ID,
-                        ContactsContract.CommonDataKinds.Phone.NUMBER,
-                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME},
-                null,
-                null,
-                null);
+    public void onFetchedContacts(ArrayList<Contact> contacts) {
+        mContacts.clear();
+        mContacts.addAll(contacts);
+        mAdapter.notifyDataSetChanged();
     }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        List<String> numbers = new ArrayList<>();
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()) {
-            String phoneNumber = cursor.getString(1);
-            phoneNumber = phoneNumber.replaceAll("-", "");
-            phoneNumber = phoneNumber.replaceAll(" ", "");
-            phoneNumber = phoneNumber.replaceAll("\\(", "");
-            phoneNumber = phoneNumber.replaceAll("\\)", "");
-            phoneNumber = phoneNumber.replaceAll("\\+", "");
-            numbers.add(phoneNumber);
-            cursor.moveToNext();
-        }
-
-        // fetch contacts who are also parse users
-        // aka people you know who are in the database
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereContainedIn("username", numbers);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> list, ParseException e) {
-                if(e == null) {
-                    mContacts.clear();
-                    for(ParseUser user : list) {
-                        Contact contact = new Contact();
-                        contact.setName((String) user.get("name"));
-                        contact.setPhoneNumber(user.getUsername());
-                        mContacts.add(contact);
-                    }
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "Something went wrong");
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
 
     public interface Listener {
     }
