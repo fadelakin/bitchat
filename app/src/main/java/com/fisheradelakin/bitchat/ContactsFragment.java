@@ -16,6 +16,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +34,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     private Listener mListener;
     private SimpleCursorAdapter mCursorAdapter;
+    private ArrayList<Contact> mContacts;
 
     public ContactsFragment() {
     }
@@ -113,7 +119,26 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             cursor.moveToNext();
         }
 
-        Log.d(TAG, "Numbers are " + numbers);
+        // fetch contacts who are also parse users
+        // aka people you know who are in the database
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereContainedIn("username", numbers);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> list, ParseException e) {
+                if(e == null) {
+                    mContacts.clear();
+                    for(ParseUser user : list) {
+                        Contact contact = new Contact();
+                        contact.setName((String) user.get("name"));
+                        contact.setPhoneNumber(user.getUsername());
+                        mContacts.add(contact);
+                    }
+                } else {
+                    Log.d(TAG, "Something went wrong");
+                }
+            }
+        });
     }
 
     @Override
