@@ -13,8 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -33,8 +35,8 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     private static final String TAG = "ContactsFragment";
 
     private Listener mListener;
-    private SimpleCursorAdapter mCursorAdapter;
-    private ArrayList<Contact> mContacts;
+    private ArrayList<Contact> mContacts = new ArrayList<>();
+    private ContactAdapter mAdapter;
 
     public ContactsFragment() {
     }
@@ -50,15 +52,8 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         String[] columns  = {ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
         int[] ids = {R.id.number, R.id.name};
 
-        mCursorAdapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.contact_list_item,
-                null,
-                columns,
-                ids,
-                0);
-
-        listView.setAdapter(mCursorAdapter);
+        mAdapter = new ContactAdapter(mContacts);
+        listView.setAdapter(mAdapter);
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -105,7 +100,6 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        mCursorAdapter.swapCursor(cursor);
         List<String> numbers = new ArrayList<>();
         cursor.moveToFirst();
         while(!cursor.isAfterLast()) {
@@ -134,6 +128,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
                         contact.setPhoneNumber(user.getUsername());
                         mContacts.add(contact);
                     }
+                    mAdapter.notifyDataSetChanged();
                 } else {
                     Log.d(TAG, "Something went wrong");
                 }
@@ -143,10 +138,26 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
     }
 
 
     public interface Listener {
+    }
+
+    private class ContactAdapter extends ArrayAdapter<Contact> {
+
+        ContactAdapter(ArrayList<Contact> contacts) {
+            super(getActivity(), R.layout.contact_list_item, R.id.name, contacts);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            convertView = super.getView(position, convertView, parent);
+            Contact contact = getItem(position);
+
+            TextView nameView = (TextView) convertView.findViewById(R.id.name);
+            nameView.setText(contact.getPhoneNumber());
+            return convertView;
+        }
     }
 }
