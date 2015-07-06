@@ -21,13 +21,18 @@ import java.util.ArrayList;
 
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String CONTACT_NUMBER = "CONTACT_NUMBER";
+
     private ArrayList<Message> mMessages;
     private MessagesAdapter mAdapter;
+    private String mRecipient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        mRecipient = getIntent().getStringExtra(CONTACT_NUMBER);
 
         mMessages = new ArrayList<>();
         mMessages.add(new Message("Hello", "34635881413"));
@@ -47,7 +52,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         Message message = new Message(newMessage, ContactDataSource.getCurrentUser().getPhoneNumber());
         mMessages.add(message);
         mAdapter.notifyDataSetChanged();
-        MessageDataSource.sendMessage(message.getSender(), "", message.getText());
+        MessageDataSource.sendMessage(message.getSender(), mRecipient, message.getText());
     }
 
     @Override
