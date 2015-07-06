@@ -44,8 +44,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         EditText newMessageView = (EditText) findViewById(R.id.new_message);
         String newMessage = newMessageView.getText().toString();
         newMessageView.setText("");
-        mMessages.add(new Message(newMessage, ContactDataSource.getCurrentUser().getPhoneNumber()));
+        Message message = new Message(newMessage, ContactDataSource.getCurrentUser().getPhoneNumber());
+        mMessages.add(message);
         mAdapter.notifyDataSetChanged();
+        MessageDataSource.sendMessage(message.getSender(), "", message.getText());
     }
 
     @Override
