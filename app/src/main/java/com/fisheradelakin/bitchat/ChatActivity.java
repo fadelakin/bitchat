@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,20 +19,33 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private ArrayList<Message> mMessages;
+    private MessagesAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        ArrayList<Message> messages = new ArrayList<>();
-        messages.add(new Message("Hello", "34635881413"));
-        messages.add(new Message("Hello", ParseUser.getCurrentUser().getUsername()));
-        messages.add(new Message("Ain't this a bitch.", ParseUser.getCurrentUser().getUsername()));
+        mMessages = new ArrayList<>();
+        mMessages.add(new Message("Hello", "34635881413"));
 
         ListView listView = (ListView) findViewById(R.id.messages_list);
-        listView.setAdapter(new MessagesAdapter(messages));
+        mAdapter = new MessagesAdapter(mMessages);
+        listView.setAdapter(mAdapter);
+
+        Button sendButton = (Button) findViewById(R.id.send_message);
+        sendButton.setOnClickListener(this);
+    }
+
+    public void onClick(View v) {
+        EditText newMessageView = (EditText) findViewById(R.id.new_message);
+        String newMessage = newMessageView.getText().toString();
+        newMessageView.setText("");
+        mMessages.add(new Message(newMessage, ContactDataSource.getCurrentUser().getPhoneNumber()));
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
