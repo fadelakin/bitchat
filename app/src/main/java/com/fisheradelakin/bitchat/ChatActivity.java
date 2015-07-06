@@ -1,5 +1,6 @@
 package com.fisheradelakin.bitchat;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
@@ -21,6 +24,7 @@ public class ChatActivity extends AppCompatActivity {
 
         ArrayList<Message> messages = new ArrayList<>();
         messages.add(new Message("Hello", "34635881413"));
+        messages.add(new Message("Hello", ParseUser.getCurrentUser().getUsername()));
 
         ListView listView = (ListView) findViewById(R.id.messages_list);
         listView.setAdapter(new MessagesAdapter(messages));
@@ -58,6 +62,10 @@ public class ChatActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             convertView = super.getView(position, convertView, parent);
             Message message = getItem(position);
+
+            if(message.getSender().equals(ContactDataSource.getCurrentUser().getPhoneNumber())) {
+                convertView.setBackgroundColor(Color.RED);
+            }
 
             TextView nameView = (TextView) convertView.findViewById(R.id.message);
             nameView.setText(message.getText());

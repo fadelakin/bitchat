@@ -15,7 +15,7 @@ public class ContactsActivity extends AppCompatActivity implements ContactsFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        if(ParseUser.getCurrentUser() == null) {
+        if(ContactDataSource.getCurrentUser() == null) {
             Intent i = new Intent(this, SignInActivity.class);
             startActivity(i);
         }
