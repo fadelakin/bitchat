@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 import com.parse.ParseUser;
 
-public class ContactsActivity extends AppCompatActivity {
+public class ContactsActivity extends AppCompatActivity implements ContactsFragment.Listener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,5 +42,11 @@ public class ContactsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onContactSelected(Contact contact) {
+        Intent i = new Intent(this, ChatActivity.class);
+        startActivity(i);
     }
 }

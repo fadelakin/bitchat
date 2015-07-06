@@ -62,7 +62,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            // mListener = (OnFragmentInteractionListener) activity;
+            mListener = (Listener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -77,7 +77,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        mListener.onContactSelected(mContacts.get(position));
     }
 
     @Override
@@ -88,6 +88,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     public interface Listener {
+        void onContactSelected(Contact contact);
     }
 
     private class ContactAdapter extends ArrayAdapter<Contact> {

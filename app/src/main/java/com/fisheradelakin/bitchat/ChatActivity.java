@@ -19,8 +19,11 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        ArrayList<Message> messages = new ArrayList<>();
+        messages.add(new Message("Hello", "34635881413"));
+
         ListView listView = (ListView) findViewById(R.id.messages_list);
-        listView.setAdapter(new MessagesAdapter(new ArrayList<Message>()));
+        listView.setAdapter(new MessagesAdapter(messages));
     }
 
     @Override
@@ -48,7 +51,7 @@ public class ChatActivity extends AppCompatActivity {
     private class MessagesAdapter extends ArrayAdapter<Message> {
 
         MessagesAdapter(ArrayList<Message> messages) {
-            super(ChatActivity.this, R.layout.messages_list_item, R.id.name, messages);
+            super(ChatActivity.this, R.layout.messages_list_item, R.id.message, messages);
         }
 
         @Override
