@@ -3,11 +3,13 @@ package com.fisheradelakin.bitchat;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,6 +27,7 @@ public class ChatActivity extends AppCompatActivity {
         ArrayList<Message> messages = new ArrayList<>();
         messages.add(new Message("Hello", "34635881413"));
         messages.add(new Message("Hello", ParseUser.getCurrentUser().getUsername()));
+        messages.add(new Message("Ain't this a bitch.", ParseUser.getCurrentUser().getUsername()));
 
         ListView listView = (ListView) findViewById(R.id.messages_list);
         listView.setAdapter(new MessagesAdapter(messages));
@@ -63,12 +66,20 @@ public class ChatActivity extends AppCompatActivity {
             convertView = super.getView(position, convertView, parent);
             Message message = getItem(position);
 
-            if(message.getSender().equals(ContactDataSource.getCurrentUser().getPhoneNumber())) {
-                convertView.setBackgroundColor(Color.RED);
-            }
-
             TextView nameView = (TextView) convertView.findViewById(R.id.message);
             nameView.setText(message.getText());
+
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) nameView.getLayoutParams();
+
+            if(message.getSender().equals(ContactDataSource.getCurrentUser().getPhoneNumber())) {
+                nameView.setBackground(getDrawable(R.drawable.bubble_right_green));
+                layoutParams.gravity = Gravity.END;
+            } else {
+                nameView.setBackground(getDrawable(R.drawable.bubble_left_gray));
+                layoutParams.gravity = Gravity.LEFT;
+            }
+            nameView.setLayoutParams(layoutParams);
+
             return convertView;
         }
     }
