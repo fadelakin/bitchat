@@ -91,6 +91,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mListView.setSelection(mMessages.size() - 1);
     }
 
+    @Override
+    public void onAddMessages(ArrayList<Message> messages) {
+
+    }
+
     private class MessagesAdapter extends ArrayAdapter<Message> {
 
         MessagesAdapter(ArrayList<Message> messages) {
