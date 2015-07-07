@@ -35,6 +35,7 @@ public class MessageDataSource {
         queries.add(queryRecieved);
 
         ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.orderByAscending("createAt");
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {

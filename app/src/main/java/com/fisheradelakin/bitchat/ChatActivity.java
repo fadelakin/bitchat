@@ -26,6 +26,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Message> mMessages;
     private MessagesAdapter mAdapter;
     private String mRecipient;
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +37,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         mMessages = new ArrayList<>();
 
-        ListView listView = (ListView) findViewById(R.id.messages_list);
+        mListView = (ListView) findViewById(R.id.messages_list);
         mAdapter = new MessagesAdapter(mMessages);
-        listView.setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
         Button sendButton = (Button) findViewById(R.id.send_message);
         sendButton.setOnClickListener(this);
@@ -87,6 +88,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mMessages.clear();
         mMessages.addAll(messages);
         mAdapter.notifyDataSetChanged();
+        mListView.setSelection(mMessages.size() - 1);
     }
 
     private class MessagesAdapter extends ArrayAdapter<Message> {
