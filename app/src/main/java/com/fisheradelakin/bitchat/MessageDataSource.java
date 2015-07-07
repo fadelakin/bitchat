@@ -22,10 +22,20 @@ public class MessageDataSource {
     }
 
     public static void fetchMessages(String sender, String recipient, final Listener listener) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
-        query.whereEqualTo("sender", sender);
-        query.whereEqualTo("recipient", recipient);
-        query.findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<ParseObject> querySent = ParseQuery.getQuery("Message");
+        querySent.whereEqualTo("sender", sender);
+        querySent.whereEqualTo("recipient", recipient);
+
+        ParseQuery<ParseObject> queryRecieved = ParseQuery.getQuery("Message");
+        queryRecieved.whereEqualTo("sender", recipient);
+        queryRecieved.whereEqualTo("recipient", sender);
+
+        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
+        queries.add(querySent);
+        queries.add(queryRecieved);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(queries);
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 ArrayList<Message> messages = new ArrayList<Message>();
