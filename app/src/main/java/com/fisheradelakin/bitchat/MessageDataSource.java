@@ -28,13 +28,15 @@ public class MessageDataSource {
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
-                ArrayList<Message> messages = new ArrayList<Message>();
-                for(ParseObject object : list) {
-                    Message message = new Message(object.getString("text"), object.getString("sender"));
-                    message.setDate(object.getCreatedAt());
-                    messages.add(message);
+                if(e == null) {
+                    ArrayList<Message> messages = new ArrayList<Message>();
+                    for (ParseObject object : list) {
+                        Message message = new Message(object.getString("text"), object.getString("sender"));
+                        message.setDate(object.getCreatedAt());
+                        messages.add(message);
+                    }
+                    listener.onAddMessages(messages);
                 }
-                listener.onAddMessages(messages);
             }
         });
     }
@@ -45,13 +47,15 @@ public class MessageDataSource {
         mainQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
-                ArrayList<Message> messages = new ArrayList<Message>();
-                for(ParseObject object : list) {
-                    Message message = new Message(object.getString("text"), object.getString("sender"));
-                    message.setDate(object.getCreatedAt());
-                    messages.add(message);
+                if(e == null) {
+                    ArrayList<Message> messages = new ArrayList<Message>();
+                    for (ParseObject object : list) {
+                        Message message = new Message(object.getString("text"), object.getString("sender"));
+                        message.setDate(object.getCreatedAt());
+                        messages.add(message);
+                    }
+                    listener.onFetchedMessages(messages);
                 }
-                listener.onFetchedMessages(messages);
             }
         });
     }
